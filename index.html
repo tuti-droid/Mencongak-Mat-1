@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KUIS MENCONGAK - SMK Kelas X</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter & Math-friendly font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .math-font {
+            font-family: 'Fira Code', monospace;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 text-white p-2 rounded-xl font-bold text-xl shadow-md shadow-indigo-500/20">
+                    🧮
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-extrabold text-white tracking-wide">KUIS MENCONGAK</h1>
+                    <p class="text-xs text-indigo-400 font-medium">Matematika Dasar (KABATAKU) • SMK Kelas X</p>
+                </div>
+            </div>
+            <!-- Global Timer Badge (Visible during quiz) -->
+            <div id="globalTimerBadge" class="hidden flex items-center gap-2 bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl">
+                <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Sisa Waktu Total:</span>
+                <span id="globalTimer" class="font-mono text-lg font-bold text-amber-400">60:00</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl w-full mx-auto p-4 my-auto">
+
+        <!-- SECTION 1: START FORM & RULES -->
+        <div id="startSection" class="bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="text-center mb-8">
+                <span class="bg-indigo-500/10 text-indigo-400 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-500/20 uppercase tracking-wider">Evaluasi Kemampuan Berhitung Cepat</span>
+                <h2 class="text-2xl md:text-3xl font-black text-white mt-3">Identitas Peserta Kuis</h2>
+                <p class="text-slate-400 text-sm mt-1">Lengkapi data diri Anda dengan benar sebelum memulai ujian.</p>
+            </div>
+
+            <form id="identityForm" onsubmit="startQuiz(event)" class="space-y-5 max-w-md mx-auto">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">Nama Lengkap Siswa</label>
+                    <input type="text" id="studentName" required placeholder="Masukkan nama lengkap Anda..."
+                        class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 rounded-xl px-4 py-3 text-white placeholder-slate-500 outline-none transition">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">Kelas</label>
+                    <input type="text" value="X TO 1" readonly
+                        class="w-full bg-slate-900/60 border border-slate-700/60 rounded-xl px-4 py-3 text-indigo-400 font-bold cursor-not-allowed outline-none">
+                </div>
+
+                <!-- Rules Box -->
+                <div class="bg-amber-950/40 border border-amber-600/30 rounded-xl p-4 text-xs text-amber-200/90 leading-relaxed space-y-2">
+                    <div class="font-bold text-amber-400 flex items-center gap-1.5 text-sm">
+                        ⚠️ ATURAN & CATATAN IMPORTANT:
+                    </div>
+                    <ul class="list-disc list-inside space-y-1 text-slate-300">
+                        <li>Jumlah soal: <strong class="text-white">60 soal</strong> bertingkat (mudah ke sulit).</li>
+                        <li>Total durasi maksimal: <strong class="text-white">60 menit</strong>.</li>
+                        <li><strong class="text-amber-400">Waktu per soal berjalan otomatis!</strong> Soal akan langsung berpindah ketika waktu per soal habis.</li>
+                        <li><strong class="text-rose-400">DILARANG membuka/menutup tab atau aplikasi lain.</strong> Setiap aktivitas keluar dari layar akan dicatat otomatis pada lembar hasil.</li>
+                        <li>Setiap siswa <strong class="text-white">hanya memiliki 1x kesempatan pengerjaan</strong>.</li>
+                    </ul>
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-600/30 hover:shadow-indigo-500/50 transition duration-200 transform hover:-translate-y-0.5">
+                    Mulai Kerjakan Kuis Sekarang 🚀
+                </button>
+            </form>
+        </div>
+
+        <!-- SECTION 2: QUIZ INTERFACE -->
+        <div id="quizSection" class="hidden bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl">
+            <!-- Top Status Bar -->
+            <div class="flex flex-wrap justify-between items-center gap-4 pb-6 border-b border-slate-700">
+                <div>
+                    <div class="text-xs text-slate-400 font-medium">Peserta Ujian</div>
+                    <div id="displayName" class="text-base font-bold text-indigo-400">Nama Siswa</div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <!-- Difficulty Level Indicator -->
+                    <span id="levelBadge" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold px-3 py-1 rounded-full">
+                        Level: Mudah
+                    </span>
+                    <!-- Question Counter -->
+                    <div class="text-right">
+                        <span class="text-xs text-slate-400 block">Nomor Soal</span>
+                        <span class="text-lg font-black text-white"><span id="currentQuestionNum">1</span><span class="text-slate-500 text-sm"> / 60</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Per-Question Timer Bar -->
+            <div class="mt-6">
+                <div class="flex justify-between items-center text-xs mb-1.5">
+                    <span class="text-slate-400 font-medium">Sisa Waktu Soal Ini:</span>
+                    <span id="questionTimerText" class="font-mono font-bold text-amber-400 text-sm">20s</span>
+                </div>
+                <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-700">
+                    <div id="questionProgressBar" class="bg-amber-400 h-full rounded-full transition-all duration-1000 ease-linear" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Question Display Area -->
+            <div class="my-8 text-center py-8 bg-slate-900/80 rounded-2xl border border-slate-700/80 relative shadow-inner">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest block mb-2">Hitung Hasil Operasi:</span>
+                <div id="questionMath" class="math-font text-3xl sm:text-4xl md:text-5xl font-extrabold text-indigo-200 tracking-wider">
+                    <!-- Math expression dynamically injected here -->
+                </div>
+            </div>
+
+            <!-- Answer Options Grid -->
+            <div id="optionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- 4 Options generated dynamically -->
+            </div>
+
+            <!-- Tab Switching Warning Floating Banner -->
+            <div id="tabWarningBanner" class="hidden mt-6 bg-rose-500/10 border border-rose-500/30 rounded-xl p-3 text-center text-xs text-rose-300 animate-pulse">
+                ⚠️ Peringatan: Terdeteksi meninggalkan halaman kuis! Catatan pelanggaran telah direkam.
+            </div>
+        </div>
+
+        <!-- SECTION 3: RESULT REPORT -->
+        <div id="resultSection" class="hidden bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl">
+            <div class="text-center pb-6 border-b border-slate-700">
+                <div class="inline-flex p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-full mb-3 text-indigo-400 text-3xl">
+                    🏆
+                </div>
+                <h2 class="text-2xl md:text-3xl font-black text-white">Laporan Hasil Kuis Mencongak</h2>
+                <p class="text-slate-400 text-sm mt-1">Ujian telah selesai dikerjakan dan tersimpan secara permanen.</p>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
+                <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-4 text-center">
+                    <span class="text-xs text-slate-400 font-semibold block uppercase">Nilai Akhir</span>
+                    <span id="finalScore" class="text-3xl font-black text-indigo-400 mt-1 block">0</span>
+                    <span class="text-[10px] text-slate-500">Skala 0 - 100</span>
+                </div>
+                <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-4 text-center">
+                    <span class="text-xs text-slate-400 font-semibold block uppercase">Benar / Salah</span>
+                    <span class="text-xl font-bold text-emerald-400 mt-2 block"><span id="correctCount">0</span> <span class="text-slate-500 text-sm">/</span> <span id="wrongCount" class="text-rose-400">0</span></span>
+                    <span class="text-[10px] text-slate-500">Dari 60 Soal</span>
+                </div>
+                <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-4 text-center">
+                    <span class="text-xs text-slate-400 font-semibold block uppercase">Waktu Digunakan</span>
+                    <span id="timeTaken" class="text-xl font-bold text-amber-400 mt-2 block">00:00</span>
+                    <span class="text-[10px] text-slate-500">Total Durasi</span>
+                </div>
+                <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-4 text-center">
+                    <span class="text-xs text-slate-400 font-semibold block uppercase">Status Pelanggaran</span>
+                    <span id="cheatStatus" class="text-sm font-bold text-emerald-400 mt-2.5 block">Bersih (0x)</span>
+                    <span class="text-[10px] text-slate-500">Pindah Tab / App</span>
+                </div>
+            </div>
+
+            <!-- Student Detail Info -->
+            <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-4 mb-6 text-sm grid grid-cols-1 md:grid-cols-2 gap-2 text-slate-300">
+                <div><strong class="text-slate-400">Nama Siswa:</strong> <span id="resStudentName" class="text-white font-semibold"></span></div>
+                <div><strong class="text-slate-400">Kelas:</strong> <span class="text-indigo-400 font-semibold">X TO 1</span></div>
+                <div><strong class="text-slate-400">Waktu Selesai:</strong> <span id="resTimestamp" class="text-white"></span></div>
+                <div><strong class="text-slate-400">Status Ujian:</strong> <span class="text-emerald-400 font-semibold">Selesai (1x Kesempatan Digunakan)</span></div>
+            </div>
+
+            <!-- Warning Note on Fraud/Cheating if any -->
+            <div id="cheatWarningBox" class="hidden mb-6 bg-rose-950/50 border border-rose-500/40 rounded-xl p-4 text-rose-200 text-xs">
+                <div class="font-bold text-rose-400 text-sm mb-1 flex items-center gap-2">
+                    ⚠️ CATATAN PELANGGARAN TERDETEKSI:
+                </div>
+                <p id="cheatWarningText"></p>
+            </div>
+
+            <!-- Answer Summary Table (No Solutions/Explanations) -->
+            <div class="mt-6">
+                <h3 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+                    <span>📋</span> Ringkasan Lembar Jawaban
+                </h3>
+                <div class="max-h-60 overflow-y-auto border border-slate-700 rounded-xl bg-slate-900">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-800 text-slate-400 uppercase sticky top-0 border-b border-slate-700">
+                            <tr>
+                                <th class="p-3 w-12 text-center">No</th>
+                                <th class="p-3">Soal Operasi</th>
+                                <th class="p-3 text-center">Jawaban Anda</th>
+                                <th class="p-3 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryTableBody" class="divide-y divide-slate-800">
+                            <!-- Dynamic summary rows -->
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-2 text-center">* Pembahasan rinci soal tidak ditampilkan sesuai standar Kuis Mencongak Cepat.</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-8 flex justify-center">
+                <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl border border-slate-600 transition flex items-center gap-2">
+                    🖨️ Cetak / Simpan Hasil (PDF)
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+        <p>&copy; 2026 Kuis Mencongak Matematika SMK Kelas X • Jurusan TO 1</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // GLOBAL STATE
+        let studentData = { name: '', class: 'X TO 1' };
+        let questions = [];
+        let currentIndex = 0;
+        let userAnswers = [];
+        let globalTimerInterval = null;
+        let questionTimerInterval = null;
+        let totalGlobalTimeSeconds = 3600; // 60 minutes
+        let globalTimeElapsed = 0;
+        let currentQuestionTimeLeft = 0;
+        let currentQuestionDuration = 0;
+        let tabSwitchCount = 0;
+        let isQuizFinished = false;
+
+        // GENERATE 60 GRADED QUESTIONS (KABATAKU: +, -, *, /)
+        function generateQuestions() {
+            const list = [];
+
+            // Helper to formatted expression string
+            // Uses only visual math symbols: +, −, ×, ÷
+            const formatMath = (str) => {
+                return str
+                    .replace(/\*/g, ' × ')
+                    .replace(/\//g, ' ÷ ')
+                    .replace(/\+/g, ' + ')
+                    .replace(/-/g, ' − ');
+            };
+
+            // Helper to wrap negative numbers in parentheses for clarity
+            const fmt = (num) => num < 0 ? `(${num})` : `${num}`;
+
+            // LEVEL 1: Very Easy (Soal 1 - 15)
+            // Single operation +, -, * with positive numbers & small values
+            // Time per question: 20s
+            for (let i = 1; i <= 15; i++) {
+                let a, b, op, ans, exprStr;
+                if (i <= 5) { // Addition
+                    a = Math.floor(Math.random() * 20) + 1;
+                    b = Math.floor(Math.random() * 20) + 1;
+                    ans = a + b;
+                    exprStr = `${a} + ${b}`;
+                } else if (i <= 10) { // Subtraction
+                    a = Math.floor(Math.random() * 30) + 5;
+                    b = Math.floor(Math.random() * a) + 1;
+                    ans = a - b;
+                    exprStr = `${a} - ${b}`;
+                } else { // Multiplication
+                    a = Math.floor(Math.random() * 10) + 1;
+                    b = Math.floor(Math.random() * 10) + 1;
+                    ans = a * b;
+                    exprStr = `${a} * ${b}`;
+                }
+                list.push({
+                    id: i,
+                    level: 'Sangat Mudah',
+                    timeLimit: 20,
+                    exprDisplay: exprStr.replace(/\*/g, '×').replace(/-/g, '−'),
+                    correctAnswer: ans
+                });
+            }
+
+            // LEVEL 2: Easy (Soal 16 - 30)
+            // Division, basic negative numbers, zero included
+            // Time per question: 35s
+            for (let i = 16; i <= 30; i++) {
+                let a, b, ans, exprStr;
+                if (i <= 20) { // Division with exact integer
+                    ans = Math.floor(Math.random() * 12) + 1;
+                    b = Math.floor(Math.random() * 9) + 2;
+                    a = ans * b;
+                    exprStr = `${a} / ${b}`;
+                } else if (i <= 25) { // Operations with Zero or Negative
+                    a = Math.floor(Math.random() * 20) - 10; // -10 to 9
+                    b = Math.floor(Math.random() * 15) + 1;
+                    ans = a + b;
+                    exprStr = `${fmt(a)} + ${fmt(b)}`;
+                } else { // Negative multiplication
+                    a = Math.floor(Math.random() * 10) - 5; // -5 to 4
+                    b = Math.floor(Math.random() * 8) + 1;
+                    ans = a * b;
+                    exprStr = `${fmt(a)} * ${fmt(b)}`;
+                }
+                list.push({
+                    id: i,
+                    level: 'Mudah',
+                    timeLimit: 35,
+                    exprDisplay: exprStr.replace(/\*/g, '×').replace(/\//g, '÷').replace(/-/g, '−'),
+                    correctAnswer: ans
+                });
+            }
+
+            // LEVEL 3: Medium (Soal 31 - 45)
+            // 2-step mixed operations, larger negative numbers
+            // Time per question: 50s
+            for (let i = 31; i <= 45; i++) {
+                let a, b, c, ans, exprStr;
+                if (i <= 38) { // a + b * c or a * b - c
+                    a = Math.floor(Math.random() * 15) - 5;
+                    b = Math.floor(Math.random() * 8) + 1;
+                    c = Math.floor(Math.random() * 10) - 3;
+                    if (i % 2 === 0) {
+                        ans = a + (b * c);
+                        exprStr = `${fmt(a)} + ${fmt(b)} * ${fmt(c)}`;
+                    } else {
+                        ans = (a * b) - c;
+                        exprStr = `${fmt(a)} * ${fmt(b)} - ${fmt(c)}`;
+                    }
+                } else { // Division with negative numbers
+                    let quotient = Math.floor(Math.random() * 10) - 5;
+                    if (quotient === 0) quotient = 2;
+                    b = Math.floor(Math.random() * 8) + 2;
+                    a = quotient * b;
+                    c = Math.floor(Math.random() * 15) - 5;
+                    ans = quotient + c;
+                    exprStr = `${fmt(a)} / ${fmt(b)} + ${fmt(c)}`;
+                }
+                list.push({
+                    id: i,
+                    level: 'Sedang',
+                    timeLimit: 50,
+                    exprDisplay: exprStr.replace(/\*/g, '×').replace(/\//g, '÷').replace(/-/g, '−'),
+                    correctAnswer: ans
+                });
+            }
+
+            // LEVEL 4: Hard / Complex (Soal 46 - 60)
+            // Multi-step precedence rules, large negatives, zeroes
+            // Time per question: 75s
+            for (let i = 46; i <= 60; i++) {
+                let a, b, c, d, ans, exprStr;
+                let mult = Math.floor(Math.random() * 8) - 4; // -4 to 3
+                let divBase = Math.floor(Math.random() * 6) + 2;
+                let divTop = divBase * (Math.floor(Math.random() * 6) - 3);
+                let addVal = Math.floor(Math.random() * 20) - 10;
+                
+                // Form: (divTop / divBase) - (mult * addVal)
+                ans = (divTop / divBase) - (mult * addVal);
+                exprStr = `${fmt(divTop)} / ${fmt(divBase)} - ${fmt(mult)} * ${fmt(addVal)}`;
+
+                list.push({
+                    id: i,
+                    level: 'Tinggi',
+                    timeLimit: 75,
+                    exprDisplay: exprStr.replace(/\*/g, '×').replace(/\//g, '÷').replace(/-/g, '−'),
+                    correctAnswer: ans
+                });
+            }
+
+            return list;
+        }
+
+        // GENERATE DISTRACTOR OPTIONS FOR MULTIPLE CHOICE
+        function generateOptions(correctAnswer) {
+            const options = new Set();
+            options.add(correctAnswer);
+
+            // Generate realistic distractors based on common arithmetic mistakes
+            const offsets = [1, -1, 2, -2, 10, -10, 5, -5, -correctAnswer];
+            for (let offset of offsets) {
+                if (options.size >= 4) break;
+                let wrong = correctAnswer + offset;
+                if (!options.has(wrong)) {
+                    options.add(wrong);
+                }
+            }
+
+            // Fill with random variations if still under 4
+            while (options.size < 4) {
+                let randOffset = (Math.floor(Math.random() * 10) + 1) * (Math.random() < 0.5 ? 1 : -1);
+                let wrong = correctAnswer + randOffset;
+                if (!options.has(wrong)) {
+                    options.add(wrong);
+                }
+            }
+
+            // Shuffle array
+            return Array.from(options).sort(() => Math.random() - 0.5);
+        }
+
+        // START QUIZ
+        function startQuiz(event) {
+            event.preventDefault();
+            const nameInput = document.getElementById('studentName').value.trim();
+            if (!nameInput) return;
+
+            // Check if already taken in this browser session
+            if (localStorage.getItem('kuis_mencongak_completed') === 'true') {
+                alert('Anda telah mengerjakan kuis ini sebelumnya. Kuis hanya dapat dikerjakan 1 kali.');
+                return;
+            }
+
+            studentData.name = nameInput;
+            questions = generateQuestions();
+            currentIndex = 0;
+            userAnswers = [];
+
+            // UI Switch
+            document.getElementById('startSection').classList.add('hidden');
+            document.getElementById('quizSection').classList.remove('hidden');
+            document.getElementById('globalTimerBadge').classList.remove('hidden');
+            document.getElementById('displayName').innerText = studentData.name;
+
+            // Start Global Timer (60 Mins)
+            startGlobalTimer();
+
+            // Setup Tab Switch / Anti Cheat Detector
+            setupAntiCheat();
+
+            // Render First Question
+            renderQuestion();
+        }
+
+        // GLOBAL 60-MIN TIMER
+        function startGlobalTimer() {
+            const globalTimerEl = document.getElementById('globalTimer');
+            globalTimerInterval = setInterval(() => {
+                totalGlobalTimeSeconds--;
+                globalTimeElapsed++;
+
+                let m = Math.floor(totalGlobalTimeSeconds / 60);
+                let s = totalGlobalTimeSeconds % 60;
+                globalTimerEl.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+                if (totalGlobalTimeSeconds <= 0) {
+                    clearInterval(globalTimerInterval);
+                    finishQuiz('Waktu total 60 menit telah habis.');
+                }
+            }, 1000);
+        }
+
+        // RENDER QUESTION
+        function renderQuestion() {
+            if (currentIndex >= questions.length) {
+                finishQuiz('Semua soal telah selesai dikerjakan.');
+                return;
+            }
+
+            const q = questions[currentIndex];
+            document.getElementById('currentQuestionNum').innerText = q.id;
+            document.getElementById('questionMath').innerText = q.exprDisplay;
+
+            // Badge styling
+            const levelBadge = document.getElementById('levelBadge');
+            levelBadge.innerText = `Level: ${q.level}`;
+            if (q.level === 'Sangat Mudah') {
+                levelBadge.className = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold px-3 py-1 rounded-full";
+            } else if (q.level === 'Mudah') {
+                levelBadge.className = "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-xs font-semibold px-3 py-1 rounded-full";
+            } else if (q.level === 'Sedang') {
+                levelBadge.className = "bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold px-3 py-1 rounded-full";
+            } else {
+                levelBadge.className = "bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-semibold px-3 py-1 rounded-full";
+            }
+
+            // Render Options Buttons
+            const options = generateOptions(q.correctAnswer);
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = "w-full bg-slate-700/60 hover:bg-indigo-600/80 active:bg-indigo-700 text-white font-bold text-xl py-4 px-6 rounded-xl border border-slate-600 hover:border-indigo-400 transition transform active:scale-95 text-center math-font shadow-md";
+                btn.innerText = opt;
+                btn.onclick = () => handleAnswer(opt);
+                container.appendChild(btn);
+            });
+
+            // Start Per-Question Timer
+            startQuestionTimer(q.timeLimit);
+        }
+
+        // PER-QUESTION TIMER
+        function startQuestionTimer(duration) {
+            clearInterval(questionTimerInterval);
+            currentQuestionDuration = duration;
+            currentQuestionTimeLeft = duration;
+
+            const timerText = document.getElementById('questionTimerText');
+            const progressBar = document.getElementById('questionProgressBar');
+
+            timerText.innerText = `${currentQuestionTimeLeft}s`;
+            progressBar.style.width = '100%';
+
+            questionTimerInterval = setInterval(() => {
+                currentQuestionTimeLeft--;
+                timerText.innerText = `${currentQuestionTimeLeft}s`;
+                
+                let pct = (currentQuestionTimeLeft / currentQuestionDuration) * 100;
+                progressBar.style.width = `${pct}%`;
+
+                if (currentQuestionTimeLeft <= 0) {
+                    clearInterval(questionTimerInterval);
+                    // Time out for this question: Record as unanswered / null
+                    handleAnswer(null, true);
+                }
+            }, 1000);
+        }
+
+        // HANDLE ANSWER SELECTION / TIMEOUT
+        function handleAnswer(selectedVal, isTimeout = false) {
+            clearInterval(questionTimerInterval);
+
+            const q = questions[currentIndex];
+            const isCorrect = selectedVal === q.correctAnswer;
+
+            userAnswers.push({
+                questionId: q.id,
+                expr: q.exprDisplay,
+                userAns: selectedVal !== null ? selectedVal : '(Waktu Habis)',
+                correctAns: q.correctAnswer,
+                isCorrect: isCorrect
+            });
+
+            currentIndex++;
+            renderQuestion();
+        }
+
+        // ANTI-CHEAT: TAB / FOCUS CHANGE DETECTOR
+        function setupAntiCheat() {
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && !isQuizFinished) {
+                    tabSwitchCount++;
+                    const banner = document.getElementById('tabWarningBanner');
+                    banner.classList.remove('hidden');
+                    setTimeout(() => {
+                        banner.classList.add('hidden');
+                    }, 5000);
+                }
+            });
+        }
+
+        // FINISH QUIZ AND SHOW REPORT
+        function finishQuiz(reason = '') {
+            isQuizFinished = true;
+            clearInterval(globalTimerInterval);
+            clearInterval(questionTimerInterval);
+
+            // Mark as completed in local storage
+            localStorage.setItem('kuis_mencongak_completed', 'true');
+
+            // Calculate Score
+            let correctCount = userAnswers.filter(a => a.isCorrect).length;
+            let wrongCount = userAnswers.length - correctCount;
+            let finalScore = Math.round((correctCount / questions.length) * 100);
+
+            // Format time taken
+            let minsTaken = Math.floor(globalTimeElapsed / 60);
+            let secsTaken = globalTimeElapsed % 60;
+            let timeStr = `${minsTaken} mnt ${secsTaken} det`;
+
+            // UI Transitions
+            document.getElementById('quizSection').classList.add('hidden');
+            document.getElementById('globalTimerBadge').classList.add('hidden');
+            document.getElementById('resultSection').classList.remove('hidden');
+
+            // Populate Results
+            document.getElementById('finalScore').innerText = finalScore;
+            document.getElementById('correctCount').innerText = correctCount;
+            document.getElementById('wrongCount').innerText = wrongCount;
+            document.getElementById('timeTaken').innerText = timeStr;
+            document.getElementById('resStudentName').innerText = studentData.name;
+            document.getElementById('resTimestamp').innerText = new Date().toLocaleString('id-ID');
+
+            // Fraud / Tab switch status
+            const cheatStatusEl = document.getElementById('cheatStatus');
+            if (tabSwitchCount > 0) {
+                cheatStatusEl.innerText = `Terdeteksi (${tabSwitchCount}x)`;
+                cheatStatusEl.className = "text-sm font-bold text-rose-400 mt-2.5 block";
+
+                const cheatBox = document.getElementById('cheatWarningBox');
+                const cheatText = document.getElementById('cheatWarningText');
+                cheatBox.classList.remove('hidden');
+                cheatText.innerText = `Siswa meninggalkan halaman/pindah tab sebanyak ${tabSwitchCount} kali selama kuis berlangsung. Hal ini tercatat secara permanen pada laporan guru.`;
+            } else {
+                cheatStatusEl.innerText = "Bersih (0x)";
+                cheatStatusEl.className = "text-sm font-bold text-emerald-400 mt-2.5 block";
+            }
+
+            // Populate Summary Table
+            const tableBody = document.getElementById('summaryTableBody');
+            tableBody.innerHTML = '';
+
+            userAnswers.forEach((ans, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = idx % 2 === 0 ? 'bg-slate-900/40' : 'bg-slate-800/40';
+
+                const statusBadge = ans.isCorrect 
+                    ? `<span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold">Benar</span>`
+                    : `<span class="bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-bold">Salah</span>`;
+
+                tr.innerHTML = `
+                    <td class="p-3 text-center font-mono text-slate-400">${ans.questionId}</td>
+                    <td class="p-3 font-mono text-slate-200 font-semibold">${ans.expr}</td>
+                    <td class="p-3 text-center font-mono ${ans.isCorrect ? 'text-emerald-400 font-bold' : 'text-rose-400'}">${ans.userAns}</td>
+                    <td class="p-3 text-center">${statusBadge}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
